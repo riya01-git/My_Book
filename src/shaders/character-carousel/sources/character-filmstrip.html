@@ -247,10 +247,82 @@
         will-change: auto;
       }
     }
+  
+    /* Falling Petals */
+    .petals-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1; /* Below the deck */
+    }
+    .petal {
+      position: absolute;
+      background: #ffb7c5;
+      border-radius: 150% 0 150% 0;
+      box-shadow: inset 0 0 5px rgba(255, 105, 180, 0.4);
+      opacity: 0.8;
+      animation: fall linear infinite;
+      top: -10%;
+    }
+    
+    @keyframes fall {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate3d(var(--x-dest), 110vh, 0) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+
   </style>
 </head>
 <body>
   <main class="stage" id="stage" aria-label="Interactive editorial character filmstrip">
+
+    <!-- Petals Spawner -->
+    <div id="petals" class="petals-container"></div>
+    <script>
+      (function() {
+        const container = document.getElementById('petals');
+        const numPetals = 40;
+        
+        for (let i = 0; i < numPetals; i++) {
+          const petal = document.createElement('div');
+          petal.className = 'petal';
+          
+          // Randomize properties
+          const size = Math.random() * 10 + 10; // 10px to 20px
+          const left = Math.random() * 100; // 0 to 100%
+          const delay = Math.random() * 10; // 0 to 10s
+          const duration = Math.random() * 5 + 8; // 8s to 13s
+          const xDest = (Math.random() * 200 - 100) + 'px'; // sway
+          const rot = (Math.random() * 720) + 'deg';
+          
+          petal.style.width = size + 'px';
+          petal.style.height = size + 'px';
+          petal.style.left = left + '%';
+          petal.style.animationDelay = delay + 's';
+          petal.style.animationDuration = duration + 's';
+          petal.style.setProperty('--x-dest', xDest);
+          petal.style.setProperty('--rot', rot);
+          
+          container.appendChild(petal);
+        }
+      })();
+    </script>
+
     <h1 class="sr-only">Character Filmstrip</h1>
     <p class="sr-only">Move, scroll, or use the arrow keys to browse the portraits.</p>
     <div class="deck" id="deck" data-testid="filmstrip"></div>
