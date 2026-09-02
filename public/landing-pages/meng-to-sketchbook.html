@@ -594,7 +594,7 @@ button{font:inherit}
   function generatePageImageAsync(chapter) {
     return new Promise((resolve) => {
       // Small timeout to allow the browser thread to breathe (non-blocking)
-      setTimeout(() => {
+      setTimeout(async () => {
         const canvas = document.createElement('canvas');
         canvas.width = 1760;
         canvas.height = 1240;
@@ -607,20 +607,45 @@ button{font:inherit}
           ctx.beginPath();
           ctx.roundRect(880, 0, 880, 1240, { upperRight: 56, lowerRight: 56, upperLeft: 0, lowerLeft: 0 });
           ctx.clip();
-          ctx.fillStyle = '#171920'; 
+          
+          // Soft pastel pink/blush gradient
+          const grad = ctx.createLinearGradient(880, 0, 1760, 1240);
+          grad.addColorStop(0, '#FFF5F5'); // Soft blush
+          grad.addColorStop(1, '#F3E1E1'); // Deeper pastel rose
+          ctx.fillStyle = grad;
           ctx.fillRect(880, 0, 880, 1240);
-          ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
-          ctx.lineWidth = 4;
-          ctx.strokeRect(920, 40, 800, 1160);
-          ctx.lineWidth = 1;
+          
+          // Dusty rose double border
+          ctx.strokeStyle = 'rgba(210, 166, 166, 0.8)';
+          ctx.lineWidth = 6;
           ctx.strokeRect(930, 50, 780, 1140);
-          ctx.fillStyle = '#d4af37'; 
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(944, 64, 752, 1112);
+
+          // Draw botanical leaf element asynchronously
+          try {
+            const img = new Image();
+            img.src = 'meng-to-sketchbook/botany-left.png';
+            await new Promise((r, reject) => { 
+              img.onload = r; 
+              img.onerror = reject;
+            });
+            ctx.globalAlpha = 0.5;
+            const imgWidth = 450;
+            const imgHeight = (img.height / img.width) * imgWidth;
+            ctx.drawImage(img, 1320 - imgWidth/2, 750, imgWidth, imgHeight);
+            ctx.globalAlpha = 1.0;
+          } catch(e) {}
+          
+          // Deep mauve title
+          ctx.fillStyle = '#5A4648'; 
           ctx.font = 'italic 160px "Instrument Serif", serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('AaRiyan', 1320, 500);
+          ctx.fillText('AaRiyan', 1320, 480);
+          
           ctx.font = '40px "Newsreader", serif';
-          ctx.fillText('A Story of Us', 1320, 680);
+          ctx.fillText('A Story of Us', 1320, 640);
           ctx.restore();
         } else {
           ctx.beginPath();
