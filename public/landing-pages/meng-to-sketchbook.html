@@ -505,17 +505,6 @@ button{font:inherit}
 </main>
 
 <script>
-  document.fonts.ready.then(() => {
-    
-/* =====================================================================
-   AaRiyan — sketchbook hero.
-   Spreads are transparent PNGs of an open sketchbook generated with
-   Higgsfield.  The leaf that turns is a real curved surface: a chain of
-   nested strips whose tangent sweeps through an arc, so the page bends
-   the way paper bends instead of pivoting like a flat door.
-   ===================================================================== */
-const Q=new URLSearchParams(location.search);
-const DIR='meng-to-sketchbook/';
 
   const customChapters = [
     {
@@ -602,118 +591,112 @@ const DIR='meng-to-sketchbook/';
     }
   }
 
-  function generatePageImage(chapter) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1760;
-    canvas.height = 1240;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, 1760, 1240);
+  function generatePageImageAsync(chapter) {
+    return new Promise((resolve) => {
+      // Small timeout to allow the browser thread to breathe (non-blocking)
+      setTimeout(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1760;
+        canvas.height = 1240;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        ctx.clearRect(0, 0, 1760, 1240);
 
-    if (chapter.isCover) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(880, 0, 880, 1240, { upperRight: 56, lowerRight: 56, upperLeft: 0, lowerLeft: 0 });
-      ctx.clip();
-      
-      // Beautiful dark navy/vintage color for the cover
-      ctx.fillStyle = '#171920'; 
-      ctx.fillRect(880, 0, 880, 1240);
-      
-      // Gold foil border
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(920, 40, 800, 1160);
-      ctx.lineWidth = 1;
-      ctx.strokeRect(930, 50, 780, 1140);
-      
-      // Cover Title
-      ctx.fillStyle = '#d4af37'; // gold
-      ctx.font = 'italic 160px "Instrument Serif", serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('AaRiyan', 1320, 500);
-      
-      // Cover Subtitle
-      ctx.font = '40px "Newsreader", serif';
-      ctx.fillText('A Story of Us', 1320, 680);
-      
-      ctx.restore();
-      return canvas.toDataURL('image/png');
-    }
-    
-    // Rounded corners mask
-    ctx.beginPath();
-    ctx.roundRect(0, 0, 1760, 1240, 56);
-    ctx.clip();
-    
-    // Background paper
-    ctx.fillStyle = '#ece7dc';
-    ctx.fillRect(0, 0, 1760, 1240);
-    
-    // Spine shadow
-    const gradient = ctx.createLinearGradient(0, 0, 1760, 0);
-    gradient.addColorStop(0, 'rgba(0,0,0,0.01)');
-    gradient.addColorStop(0.48, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.5, 'rgba(0,0,0,0.12)'); // spine dark
-    gradient.addColorStop(0.52, 'rgba(0,0,0,0)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0.01)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 1760, 1240);
-
-    // Spine line
-    ctx.strokeStyle = 'rgba(43,39,33,0.05)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(880, 0);
-    ctx.lineTo(880, 1240);
-    ctx.stroke();
-
-    // Left page: Title
-    if (chapter.title) {
-      ctx.fillStyle = '#2b2721';
-      ctx.font = 'italic 76px "Instrument Serif", serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      const titleWords = chapter.title.split(' ');
-      let titleLine = '';
-      let titleLines = [];
-      for (let n = 0; n < titleWords.length; n++) {
-        const testLine = titleLine + titleWords[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > 600 && n > 0) {
-          titleLines.push(titleLine);
-          titleLine = titleWords[n] + ' ';
+        if (chapter.isCover) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(880, 0, 880, 1240, { upperRight: 56, lowerRight: 56, upperLeft: 0, lowerLeft: 0 });
+          ctx.clip();
+          ctx.fillStyle = '#171920'; 
+          ctx.fillRect(880, 0, 880, 1240);
+          ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(920, 40, 800, 1160);
+          ctx.lineWidth = 1;
+          ctx.strokeRect(930, 50, 780, 1140);
+          ctx.fillStyle = '#d4af37'; 
+          ctx.font = 'italic 160px "Instrument Serif", serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('AaRiyan', 1320, 500);
+          ctx.font = '40px "Newsreader", serif';
+          ctx.fillText('A Story of Us', 1320, 680);
+          ctx.restore();
         } else {
-          titleLine = testLine;
+          ctx.beginPath();
+          ctx.roundRect(0, 0, 1760, 1240, 56);
+          ctx.clip();
+          ctx.fillStyle = '#ece7dc';
+          ctx.fillRect(0, 0, 1760, 1240);
+          const gradient = ctx.createLinearGradient(0, 0, 1760, 0);
+          gradient.addColorStop(0, 'rgba(0,0,0,0.01)');
+          gradient.addColorStop(0.48, 'rgba(0,0,0,0)');
+          gradient.addColorStop(0.5, 'rgba(0,0,0,0.12)'); 
+          gradient.addColorStop(0.52, 'rgba(0,0,0,0)');
+          gradient.addColorStop(1, 'rgba(0,0,0,0.01)');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, 1760, 1240);
+          ctx.strokeStyle = 'rgba(43,39,33,0.05)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(880, 0);
+          ctx.lineTo(880, 1240);
+          ctx.stroke();
+
+          if (chapter.title) {
+            ctx.fillStyle = '#2b2721';
+            ctx.font = 'italic 76px "Instrument Serif", serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const titleWords = chapter.title.split(' ');
+            let titleLine = '';
+            let titleLines = [];
+            for (let n = 0; n < titleWords.length; n++) {
+              const testLine = titleLine + titleWords[n] + ' ';
+              const metrics = ctx.measureText(testLine);
+              if (metrics.width > 600 && n > 0) {
+                titleLines.push(titleLine);
+                titleLine = titleWords[n] + ' ';
+              } else {
+                titleLine = testLine;
+              }
+            }
+            titleLines.push(titleLine);
+            let titleY = 620 - ((titleLines.length * 90) / 2);
+            for (let i = 0; i < titleLines.length; i++) {
+              ctx.fillText(titleLines[i], 440, titleY + (i * 90));
+            }
+          }
+          
+          ctx.fillStyle = '#2b2721';
+          ctx.font = '32px "Newsreader", serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          wrapText(ctx, chapter.content, 980, 140, 660, 52);
         }
-      }
-      titleLines.push(titleLine);
-      let titleY = 620 - ((titleLines.length * 90) / 2);
-      for (let i = 0; i < titleLines.length; i++) {
-        ctx.fillText(titleLines[i], 440, titleY + (i * 90));
-      }
-    }
-    
-    // Right page: Content
-    ctx.fillStyle = '#2b2721';
-    ctx.font = '32px "Newsreader", serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    wrapText(ctx, chapter.content, 980, 140, 660, 52);
-    
-    return canvas.toDataURL('image/png');
+
+        // Generating a blob is async and very fast, non-blocking
+        canvas.toBlob((blob) => {
+          resolve(URL.createObjectURL(blob));
+        }, 'image/png');
+      }, 0);
+    });
   }
 
-  const PAGES = customChapters.map((chapter, i) => ({
-    title: chapter.title || '',
-    hideFromToc: !!chapter.hideFromToc,
-    url: generatePageImage(chapter)
-  }));
+  // Define PAGES empty initially
+  let PAGES = [];
   
-const M=PAGES.length, LAND=0;
+/* =====================================================================
+   AaRiyan — sketchbook hero.
+   Spreads are transparent PNGs of an open sketchbook generated with
+   Higgsfield.  The leaf that turns is a real curved surface: a chain of
+   nested strips whose tangent sweeps through an arc, so the page bends
+   the way paper bends instead of pivoting like a flat door.
+   ===================================================================== */
+const Q=new URLSearchParams(location.search);
+const DIR='meng-to-sketchbook/';
+
+let M=0, LAND=0;
 
 const wrap=document.getElementById('sbWrap');
 const stage=document.getElementById('sbStage');
@@ -1198,7 +1181,39 @@ function startIntro(){
 
 /* ------------------------------------------------------------- boot */
 (async function boot(){
-  idx=Q.has('shot')?(parseInt(Q.get('shot'),10)||0)%M:0;
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready.catch(()=>{});
+    
+    // Generate pages without blocking the main thread (awaiting promises one by one or in Promise.all)
+    const pagePromises = customChapters.map(async (chapter) => ({
+      title: chapter.title || '',
+      hideFromToc: !!chapter.hideFromToc,
+      url: await generatePageImageAsync(chapter)
+    }));
+    
+    PAGES = await Promise.all(pagePromises);
+    
+    // Set M and LAND
+    M = PAGES.length;
+    LAND = 0;
+    
+    // Repopulate TOC with the new pages
+    const plateList = document.getElementById('plateList');
+    plateList.innerHTML = '';
+    PAGES.forEach((p,i)=>{
+      if(p.hideFromToc) return;
+      const li=document.createElement('li');
+      const b=document.createElement('button');
+      b.className='plate';
+      b.dataset.idx=i;
+      b.innerHTML='<span class="n">'+String(i+1).padStart(2,'0')+'</span>'+
+                  '<span class="t"></span><span class="p"></span>';
+      b.querySelector('.t').textContent=p.title;
+      b.onclick=()=>{goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:'smooth',block:'center'});};
+      li.appendChild(b);plateList.appendChild(li);
+    });
+
+    idx=Q.has('shot')?(parseInt(Q.get('shot'),10)||0)%M:0;
+
   paint();applyView();
   await Promise.all(PAGES.map(p=>{
     const im=new Image();im.src=p.url;
@@ -1214,7 +1229,6 @@ function startIntro(){
   setTimeout(startIntro,220);
 })();
 
-  });
-  </script>
+</script>
 </body>
 </html>
