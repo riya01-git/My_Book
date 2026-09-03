@@ -19,6 +19,7 @@ export function App() {
   const memorySectionRef = useRef<HTMLDivElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isEntered, setIsEntered] = useState(false);
 
   // Initialize interaction to play audio
   useEffect(() => {
@@ -136,8 +137,55 @@ export function App() {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(10px); }
           }
+          
+          @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+          }
         `}
       </style>
+
+      {/* Entry Screen Overlay */}
+      {!isEntered && (
+        <div 
+          onClick={() => {
+            setIsEntered(true);
+            if (audioRef.current) {
+              audioRef.current.volume = 0.3;
+              audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+            }
+          }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            background: 'radial-gradient(circle at center, #fff0f5 0%, #ffccd5 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div style={{ position: 'relative', width: '200px', height: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', filter: 'drop-shadow(0 10px 20px rgba(255,182,193,0.6))' }}>
+            <div style={{ position: 'absolute', inset: 0, zIndex: -1 }}>
+              <FlowerShape color="#ffebf0" />
+            </div>
+            <h1 style={{ fontFamily: '"Instrument Serif", serif', fontSize: '72px', color: '#d4778d', margin: 0 }}>
+              Love
+            </h1>
+          </div>
+          <p style={{
+            fontFamily: '"Newsreader", serif',
+            fontSize: '24px',
+            color: '#d4778d',
+            marginTop: '40px',
+            fontStyle: 'italic',
+            animation: 'pulseText 2.5s infinite ease-in-out'
+          }}>
+            Tap anywhere to enter...
+          </p>
+        </div>
+      )}
 
       {/* Audio Element */}
       <audio ref={audioRef} src="/audio/man_jaie.mp4" loop preload="auto" autoPlay />
