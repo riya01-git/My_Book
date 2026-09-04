@@ -1,19 +1,21 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#d8c9ad">
   <title>Character Filmstrip</title>
   <style>
     :root {
       color-scheme: light;
-      font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+      font-family: "Newsreader", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
       background: #d8c9ad;
     }
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html,
@@ -21,17 +23,16 @@
       width: 100%;
       height: 100%;
       margin: 0;
+      padding: 0;
       overflow: hidden;
       background: #d8c9ad;
-    }
-
-    body {
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
     }
 
     button {
       font: inherit;
+      outline: none;
     }
 
     .stage {
@@ -39,23 +40,25 @@
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: 440px;
+      min-height: 100%;
       overflow: hidden;
       isolation: isolate;
       perspective: 1450px;
-      cursor: ew-resize;
+      cursor: grab;
       touch-action: none;
       background:
         linear-gradient(90deg, rgba(80, 58, 31, 0.08) 1px, transparent 1px) 50% 0 / 25% 100%,
-        repeating-linear-gradient(
-          0deg,
+        repeating-linear-gradient(0deg,
           transparent 0,
           transparent 109px,
           rgba(72, 52, 30, 0.13) 110px,
-          transparent 111px
-        ),
+          transparent 111px),
         radial-gradient(circle at var(--pointer-x) 48%, rgba(255, 246, 220, 0.78), transparent 34%),
         #d8c9ad;
+    }
+
+    .stage.is-dragging {
+      cursor: grabbing;
     }
 
     .stage::before {
@@ -77,13 +80,11 @@
       inset: 0;
       z-index: 4;
       pointer-events: none;
-      background: linear-gradient(
-        90deg,
-        rgba(84, 58, 29, 0.19),
-        transparent 14%,
-        transparent 86%,
-        rgba(84, 58, 29, 0.19)
-      );
+      background: linear-gradient(90deg,
+          rgba(84, 58, 29, 0.19),
+          transparent 14%,
+          transparent 86%,
+          rgba(84, 58, 29, 0.19));
     }
 
     .deck {
@@ -91,6 +92,7 @@
       inset: 0;
       z-index: 2;
       transform-style: preserve-3d;
+      pointer-events: auto;
     }
 
     .card {
@@ -98,23 +100,25 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: clamp(154px, 16.8vw, 238px);
-      aspect-ratio: 0.72;
-      padding: 7px;
+      width: clamp(210px, 22vw, 290px);
+      aspect-ratio: 0.65;
+      padding: 8px;
       overflow: hidden;
       border: 1px solid rgba(47, 34, 19, 0.42);
-      border-radius: 4px;
+      border-radius: 8px;
       color: #f3e7ce;
       background: #e7d9bd;
       box-shadow:
-        0 calc(10px + var(--focus) * 24px) calc(18px + var(--focus) * 36px)
-          rgba(57, 38, 19, calc(0.2 + var(--focus) * 0.26)),
+        0 calc(10px + var(--focus) * 24px) calc(18px + var(--focus) * 36px) rgba(57, 38, 19, calc(0.2 + var(--focus) * 0.26)),
         inset 0 0 0 1px rgba(255, 255, 255, 0.64);
       appearance: none;
       outline: none;
       transform-style: preserve-3d;
       will-change: transform, opacity, filter;
       cursor: pointer;
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
     }
 
     .card::before {
@@ -124,6 +128,7 @@
       z-index: 3;
       border: 1px solid rgba(28, 22, 14, calc(0.12 + var(--focus) * 0.12));
       pointer-events: none;
+      border-radius: 6px;
     }
 
     .card:focus-visible {
@@ -134,9 +139,10 @@
 
     .portrait {
       position: absolute;
-      inset: 7px 7px 25%;
+      inset: 8px 8px 38%;
       overflow: hidden;
       background: #766a58;
+      border-radius: 5px;
     }
 
     .portrait img {
@@ -146,66 +152,123 @@
       object-fit: cover;
       transform: scale(calc(1.04 + (1 - var(--focus)) * 0.06));
       filter:
-        sepia(calc((1 - var(--focus)) * 0.24))
-        saturate(calc(0.66 + var(--focus) * 0.34))
-        contrast(1.04);
+        sepia(calc((1 - var(--focus)) * 0.2)) saturate(calc(0.75 + var(--focus) * 0.35)) contrast(1.04);
+      pointer-events: none;
     }
 
     .footer {
       position: absolute;
-      right: 7px;
-      bottom: 7px;
-      left: 7px;
-      height: calc(25% - 7px);
-      display: grid;
-      grid-template-columns: clamp(26px, 3.2vw, 43px) 1fr;
-      align-items: center;
-      gap: clamp(6px, 0.7vw, 11px);
-      padding: clamp(7px, 0.8vw, 12px);
+      right: 8px;
+      bottom: 8px;
+      left: 8px;
+      height: calc(38% - 8px);
+      display: flex;
+      flex-direction: column;
+      justifyContent: flex-start;
+      padding: 8px 10px;
       color: #f0dfc2;
       background: #171612;
+      border-radius: 5px;
+      box-sizing: border-box;
+      overflow: hidden;
       text-align: left;
+    }
+
+    .footer-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+      flex-shrink: 0;
     }
 
     .index {
       display: grid;
-      width: clamp(23px, 2.7vw, 37px);
-      aspect-ratio: 1;
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
       place-items: center;
       border: 1px solid #ce5d20;
       border-radius: 50%;
       color: #d86724;
-      font: 600 clamp(7px, 0.68vw, 11px)/1 ui-monospace, "SFMono-Regular", monospace;
-    }
-
-    .meta {
-      min-width: 0;
-    }
-
-    .name,
-    .role {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      white-space: nowrap;
+      font: 600 10px/1 ui-monospace, "SFMono-Regular", monospace;
     }
 
     .name {
       color: #f3e6cc;
-      font-size: clamp(8px, 0.86vw, 13px);
+      font-size: clamp(12px, 1.1vw, 15px);
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.05em;
       line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      font-family: 'Newsreader', serif;
     }
 
     .role {
-      margin-top: clamp(3px, 0.35vw, 5px);
-      color: #d46a27;
-      font-size: clamp(5px, 0.48vw, 7px);
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      line-height: 1;
+      display: block;
+      color: #f5dfc6;
+      font-size: clamp(10px, 0.9vw, 12px);
+      font-weight: 400;
+      font-family: 'Newsreader', "Georgia", serif;
+      line-height: 1.32;
+      white-space: normal;
+      word-break: break-word;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      text-transform: none;
+      font-style: italic;
+      text-align: left;
+      opacity: 0.95;
+    }
+
+    .role::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Floating Navigation Controls */
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(30, 20, 18, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 192, 203, 0.4);
+      color: #fff0f5;
+      font-size: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .nav-btn:hover {
+      background: rgba(212, 119, 141, 0.8);
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 6px 20px rgba(212, 119, 141, 0.5);
+    }
+
+    .nav-btn:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .nav-btn.prev {
+      left: 16px;
+    }
+
+    .nav-btn.next {
+      right: 16px;
     }
 
     .sr-only {
@@ -222,23 +285,44 @@
 
     @media (max-width: 650px) {
       .stage {
-        min-height: 560px;
-        cursor: ns-resize;
+        min-height: 100%;
         background:
           linear-gradient(90deg, rgba(80, 58, 31, 0.08) 1px, transparent 1px) 50% 0 / 50% 100%,
-          repeating-linear-gradient(
-            0deg,
+          repeating-linear-gradient(0deg,
             transparent 0,
             transparent 87px,
             rgba(72, 52, 30, 0.13) 88px,
-            transparent 89px
-          ),
+            transparent 89px),
           radial-gradient(circle at 50% 50%, rgba(255, 246, 220, 0.78), transparent 35%),
           #d8c9ad;
       }
 
       .card {
-        width: clamp(142px, 47vw, 180px);
+        width: clamp(210px, 68vw, 270px);
+        aspect-ratio: 0.65;
+      }
+
+      .role {
+        font-size: 11px;
+        line-height: 1.3;
+      }
+
+      .name {
+        font-size: 13px;
+      }
+
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+
+      .nav-btn.prev {
+        left: 10px;
+      }
+
+      .nav-btn.next {
+        right: 10px;
       }
     }
 
@@ -247,8 +331,8 @@
         will-change: auto;
       }
     }
-  
-    /* Falling Petals */
+
+    /* Realistic 3D Falling Petals */
     .petals-container {
       position: absolute;
       top: 0;
@@ -257,97 +341,181 @@
       height: 100%;
       overflow: hidden;
       pointer-events: none;
-      z-index: 1; /* Below the deck */
+      z-index: 1;
+      perspective: 800px;
     }
-    .petal {
+
+    .petal-wrapper {
       position: absolute;
-      background: #ffb7c5;
-      border-radius: 150% 0 150% 0;
-      box-shadow: inset 0 0 5px rgba(255, 105, 180, 0.4);
-      opacity: 0.8;
-      animation: fall linear infinite;
-      top: -10%;
+      top: -12%;
+      animation: fallDown linear infinite;
+      will-change: transform;
     }
-    
-    @keyframes fall {
+
+    .petal-3d {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 35% 35%, #ffffff 0%, #ffdde5 35%, #ff9ebb 70%, #e06d88 100%);
+      border-radius: 120% 15% 120% 15% / 120% 15% 120% 15%;
+      box-shadow:
+        inset 0 1px 3px rgba(255, 255, 255, 0.8),
+        0 2px 6px rgba(180, 50, 80, 0.25);
+      animation: tumble 4.5s ease-in-out infinite alternate;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .petal-3d.variant-2 {
+      background: radial-gradient(ellipse at 40% 30%, #fff8fa 0%, #ffccd8 40%, #f48fa7 80%, #d45b77 100%);
+      border-radius: 20% 120% 20% 120% / 20% 120% 20% 120%;
+    }
+
+    .petal-3d.variant-3 {
+      background: radial-gradient(ellipse at 30% 40%, #ffffff 0%, #ffe6ec 45%, #ffa6be 85%, #ea708d 100%);
+      border-radius: 80% 80% 120% 10% / 100% 100% 100% 20%;
+    }
+
+    @keyframes fallDown {
       0% {
-        transform: translate3d(0, 0, 0) rotate(0deg);
+        transform: translate3d(0, 0, 0);
         opacity: 0;
       }
-      10% {
-        opacity: 0.8;
+
+      8% {
+        opacity: var(--petal-opacity);
       }
-      90% {
-        opacity: 0.8;
+
+      88% {
+        opacity: var(--petal-opacity);
       }
+
       100% {
-        transform: translate3d(var(--x-dest), 110vh, 0) rotate(var(--rot));
+        transform: translate3d(var(--x-drift), 114vh, 0);
         opacity: 0;
       }
     }
 
+    @keyframes tumble {
+      0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+
+      33% {
+        transform: rotateX(70deg) rotateY(180deg) rotateZ(90deg) scale(0.85);
+      }
+
+      66% {
+        transform: rotateX(160deg) rotateY(270deg) rotateZ(200deg) scale(1.05);
+      }
+
+      100% {
+        transform: rotateX(240deg) rotateY(360deg) rotateZ(320deg) scale(0.9);
+      }
+    }
   </style>
 </head>
-<body>
-  <main class="stage" id="stage" aria-label="Interactive editorial character filmstrip">
 
-    <!-- Petals Spawner -->
+<body>
+  <main class="stage" id="stage" aria-label="Interactive memory filmstrip">
+
+    <!-- Realistic 3D Petals Spawner -->
     <div id="petals" class="petals-container"></div>
     <script>
-      (function() {
+      (function () {
         const container = document.getElementById('petals');
-        const numPetals = 40;
-        
+        const numPetals = 42;
+
         for (let i = 0; i < numPetals; i++) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'petal-wrapper';
+
           const petal = document.createElement('div');
-          petal.className = 'petal';
-          
-          // Randomize properties
-          const size = Math.random() * 10 + 10; // 10px to 20px
-          const left = Math.random() * 100; // 0 to 100%
-          const delay = Math.random() * 10; // 0 to 10s
-          const duration = Math.random() * 5 + 8; // 8s to 13s
-          const xDest = (Math.random() * 200 - 100) + 'px'; // sway
-          const rot = (Math.random() * 720) + 'deg';
-          
-          petal.style.width = size + 'px';
-          petal.style.height = size + 'px';
-          petal.style.left = left + '%';
-          petal.style.animationDelay = delay + 's';
-          petal.style.animationDuration = duration + 's';
-          petal.style.setProperty('--x-dest', xDest);
-          petal.style.setProperty('--rot', rot);
-          
-          container.appendChild(petal);
+          const variantNum = (i % 3) + 1;
+          petal.className = `petal-3d ${variantNum > 1 ? 'variant-' + variantNum : ''}`;
+
+          // Realistic variations: sizes, depth, blurs, drift
+          const size = Math.random() * 14 + 10; // 10px to 24px
+          const left = Math.random() * 110 - 5; // -5% to 105%
+          const delay = Math.random() * 12;
+          const duration = Math.random() * 6 + 7; // 7s to 13s
+          const xDrift = (Math.random() * 260 - 130) + 'px'; // Natural sway/wind
+          const tumbleSpeed = (Math.random() * 3 + 3.5) + 's';
+          const depthOpacity = (Math.random() * 0.45 + 0.55).toFixed(2);
+          const blurAmount = Math.random() < 0.25 ? (Math.random() * 1.5 + 0.5).toFixed(1) + 'px' : '0px';
+
+          wrapper.style.width = size + 'px';
+          wrapper.style.height = (size * 1.25) + 'px';
+          wrapper.style.left = left + '%';
+          wrapper.style.animationDelay = delay + 's';
+          wrapper.style.animationDuration = duration + 's';
+          wrapper.style.filter = blurAmount !== '0px' ? `blur(${blurAmount})` : 'none';
+          wrapper.style.setProperty('--x-drift', xDrift);
+          wrapper.style.setProperty('--petal-opacity', depthOpacity);
+
+          petal.style.animationDuration = tumbleSpeed;
+          petal.style.animationDelay = (Math.random() * 2) + 's';
+
+          wrapper.appendChild(petal);
+          container.appendChild(wrapper);
         }
       })();
     </script>
 
-    <h1 class="sr-only">Character Filmstrip</h1>
-    <p class="sr-only">Move, scroll, or use the arrow keys to browse the portraits.</p>
+    <h1 class="sr-only">Memory Filmstrip</h1>
+    <p class="sr-only">Swipe, drag, use buttons, or scroll to browse the memories.</p>
+
+    <!-- 3D Card Deck -->
     <div class="deck" id="deck" data-testid="filmstrip"></div>
+
+    <!-- Navigation Buttons for easy tapping on mobile and desktop -->
+    <button class="nav-btn prev" id="prevBtn" aria-label="Previous memory">&#10094;</button>
+    <button class="nav-btn next" id="nextBtn" aria-label="Next memory">&#10095;</button>
   </main>
 
   <script>
     (() => {
-      
-      // Read 19 images from public/landing-pages/img/
-      const imgFiles = [
-        'p1.jpeg', 'p2.jpeg', 'p3.jpg', 'p4.jpg', 'p5.jpg', 
-        'p6.jpg', 'p7.jpg', 'p8.jpg', 'p9.jpg', 'p10.jpg', 
-        'p11.jpg', 'p12.jpg', 'p13.jpg', 'p14.jpg', 'p15.jpg', 
-        'p16.jpg', 'p17.jpg', 'p18.jpg', 'p20.jpg'
+      /*
+       * =========================================================================
+       * 🌸 MEMORY CARDS DATA CONFIGURATION 🌸
+       * File Location: src/shaders/character-carousel/sources/character-filmstrip.html
+       * 
+       * You can easily customize the titles ("name") and subtitles ("role")
+       * for each memory card right here:
+       * =========================================================================
+       */
+      const memoryList = [
+        { name: "24th Jan", role: "Ahh ! Anushka ka Bday, we were unaware then......", img: "p1.jpeg" },
+        { name: "4th May", role: "IPL Match , the only Match Mumbai Indians won with dignity !", img: "p2.jpeg" },
+        { name: "1st March", role: "My Birthdayayayayaya", img: "p3.jpg" },
+        { name: "15th Feb", role: "Last airport photo from our best Goa vacation", img: "p4.jpg" },
+        { name: "1st March", role: "Mere Bday pe Movie dekhne gye the ! Ahh one of my Fav place...(wapas jayenge)", img: "p5.jpg" },
+        { name: "24 May", role: "Khush ke ghar se wapas ate samay", img: "p6.jpg" },
+        { name: "11th June", role: "Seawoods aya tu itni raat ko movie dekhne , shabaash mere lover..", img: "p7.jpg" },
+        { name: "11th June", role: "OBESSED movie + Pizza = Perfect Evening", img: "p8.jpg" },
+        { name: "22nd June", role: "Poptate's Date : with my friends huh , right after my exams...", img: "p9.jpg" },
+        { name: "28th June", role: "Hamare Family mein New member ki entry..", img: "p10.jpg" },
+        { name: "MEMORY", role: "Bean Cafe SPECIAL ROMANCE", img: "p11.jpg" },
+        { name: "30th Aug 2025", role: "HEHEHEHE , wont say much", img: "p12.jpg" },
+        { name: "14th Feb", role: "W- Day , W-Moments", img: "p13.jpg" },
+        { name: "9-March 2025", role: "Ajeeb din tha - But India match jit gyi..", img: "p14.jpg" },
+        { name: "13th Feb", role: "Ye photo toh hamne dar dar ke liya tha airport ke bahar", img: "p15.jpg" },
+        { name: "18 April", role: "Whatta Banging day it was", img: "p16.jpg" },
+        { name: "13th Feb", role: "Ye photo toh hamne dar dar ke liya tha....", img: "p17.jpg" },
+        { name: "15th Feb", role: "Kho gye the bhai ankho mein....", img: "p18.jpg" },
+        { name: "15th Feb", role: "Hamaraa Best Photo Till Date", img: "p20.jpg" }
       ];
-      
-      const profiles = imgFiles.map((file, i) => ({
-        name: `Memory ${i+1}`,
-        role: `Beautiful Moments`,
-        portrait: `/landing-pages/img/${file}`
-      }));
 
+      const profiles = memoryList.map(item => ({
+        name: item.name,
+        role: item.role,
+        portrait: `/landing-pages/img/${item.img}`
+      }));
 
       const stage = document.querySelector("#stage");
       const deck = document.querySelector("#deck");
+      const prevBtn = document.querySelector("#prevBtn");
+      const nextBtn = document.querySelector("#nextBtn");
+
       const cards = profiles.map((profile, index) => {
         const card = document.createElement("button");
         card.className = "card";
@@ -359,11 +527,11 @@
             <img src="${profile.portrait}" alt="Memory ${profile.name}">
           </span>
           <span class="footer">
-            <span class="index">${String(index + 1).padStart(2, "0")}</span>
-            <span class="meta">
+            <span class="footer-header">
+              <span class="index">${String(index + 1).padStart(2, "0")}</span>
               <span class="name">${profile.name}</span>
-              <span class="role">${profile.role}</span>
             </span>
+            <span class="role">${profile.role}</span>
           </span>`;
         deck.append(card);
         return card;
@@ -371,10 +539,11 @@
 
       const count = cards.length;
       const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
       const state = {
-        phase: 3,
-        target: 3,
-        base: 3,
+        phase: 0,
+        target: 0,
+        base: 0,
         pointerX: 0,
         pointerY: 0,
         active: false,
@@ -403,50 +572,148 @@
         state.lastInput = performance.now();
       }
 
+      function stepBy(amount) {
+        state.base = Math.round(state.base) + amount;
+        state.target = state.base;
+        state.active = false;
+        state.lastInput = performance.now();
+      }
+
+      prevBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        stepBy(-1);
+      });
+
+      nextBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        stepBy(1);
+      });
+
+      // Drag & Touch Gestures
+      let isPointerDown = false;
+      let startX = 0;
+      let startY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let lastMoveTime = 0;
+      let velocity = 0;
+      let hasDragged = false;
+
+      function onPointerDown(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+
+        isPointerDown = true;
+        hasDragged = false;
+        startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+        lastX = startX;
+        lastY = startY;
+        lastMoveTime = performance.now();
+        velocity = 0;
+        state.active = true;
+        state.lastInput = performance.now();
+        stage.classList.add("is-dragging");
+
+        if (e.target && e.target.setPointerCapture && e.pointerId) {
+          try { e.target.setPointerCapture(e.pointerId); } catch (_) { }
+        }
+      }
+
+      function onPointerMove(e) {
+        const currentX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        const currentY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+        const now = performance.now();
+
+        // Parallax lighting hover
+        const rect = stage.getBoundingClientRect();
+        const nx = Math.max(-1, Math.min(1, ((currentX - rect.left) / rect.width - 0.5) * 2));
+        const ny = Math.max(-1, Math.min(1, ((currentY - rect.top) / rect.height - 0.5) * 2));
+        state.pointerX = nx;
+        state.pointerY = ny;
+        stage.style.setProperty("--pointer-x", `${(nx + 1) * 50}%`);
+
+        if (!isPointerDown) return;
+
+        const dx = currentX - lastX;
+        const dy = currentY - lastY;
+        const totalDist = Math.hypot(currentX - startX, currentY - startY);
+
+        if (totalDist > 6) {
+          hasDragged = true;
+        }
+
+        const dt = Math.max(1, now - lastMoveTime);
+        const isCompact = window.innerWidth < 650;
+
+        // Supports both horizontal and vertical dragging
+        const delta = isCompact
+          ? (Math.abs(dy) > Math.abs(dx) ? -dy : -dx)
+          : -dx;
+
+        const sensitivity = isCompact ? 130 : 180;
+        const stepChange = delta / sensitivity;
+
+        state.base += stepChange;
+        state.target = state.base;
+        state.lastInput = now;
+
+        velocity = delta / dt;
+        lastX = currentX;
+        lastY = currentY;
+        lastMoveTime = now;
+      }
+
+      function onPointerUp(e) {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        state.active = false;
+        stage.classList.remove("is-dragging");
+
+        if (hasDragged) {
+          const flick = Math.max(-3, Math.min(3, velocity * 45));
+          state.base += flick;
+          state.target = Math.round(state.base);
+          state.base = state.target;
+        } else {
+          state.target = Math.round(state.base);
+        }
+        state.lastInput = performance.now();
+      }
+
+      stage.addEventListener("pointerdown", onPointerDown);
+      stage.addEventListener("pointermove", onPointerMove);
+      stage.addEventListener("pointerup", onPointerUp);
+      stage.addEventListener("pointercancel", onPointerUp);
+
+      // Card clicks
       cards.forEach((card, index) => {
-        card.addEventListener("click", () => moveTo(index));
+        card.addEventListener("click", (e) => {
+          if (hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          moveTo(index);
+        });
         card.addEventListener("focus", () => moveTo(index));
       });
 
-      stage.addEventListener("pointermove", (event) => {
-        const rect = stage.getBoundingClientRect();
-        const nx = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
-        const ny = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
-        state.pointerX = nx;
-        state.pointerY = ny;
-        state.active = true;
-        state.target = state.base + (innerWidth < 650 ? ny * 2.2 : nx * 3.1);
-        state.lastInput = performance.now();
-        stage.style.setProperty("--pointer-x", `${(nx + 1) * 50}%`);
-      });
-
-      stage.addEventListener("pointerleave", () => {
-        state.active = false;
-        state.pointerX = 0;
-        state.pointerY = 0;
-        state.target = state.base;
-        stage.style.setProperty("--pointer-x", "50%");
-      });
-
+      // Wheel Navigation
       stage.addEventListener("wheel", (event) => {
         event.preventDefault();
-        const direction = Math.sign(Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX);
+        const delta = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+        const direction = Math.sign(delta);
         if (!direction) return;
-        state.base += direction;
-        state.target = state.base;
-        state.active = false;
-        state.lastInput = performance.now();
+        stepBy(direction);
       }, { passive: false });
 
+      // Keyboard Navigation
       addEventListener("keydown", (event) => {
         const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
         const backward = event.key === "ArrowLeft" || event.key === "ArrowUp";
         if (!forward && !backward) return;
         event.preventDefault();
-        state.base += forward ? 1 : -1;
-        state.target = state.base;
-        state.active = false;
-        state.lastInput = performance.now();
+        stepBy(forward ? 1 : -1);
       });
 
       let previousTime = performance.now();
@@ -456,16 +723,18 @@
         previousTime = time;
         const ease = reducedMotion ? 1 : 1 - Math.pow(0.001, deltaTime / 1000);
 
-        if (!state.active && time - state.lastInput > 3600) {
-          const idle = time - state.lastInput - 3600;
-          state.target = state.base + Math.sin(idle * 0.00042) * 2.45;
+        // Gentle auto drift when idle for 4 seconds
+        if (!state.active && !isPointerDown && time - state.lastInput > 4000) {
+          const idle = time - state.lastInput - 4000;
+          state.target = state.base + Math.sin(idle * 0.0004) * 1.5;
         }
 
         state.phase += (state.target - state.phase) * ease;
         const compact = innerWidth < 650;
         const activeIndex = nearestIndex();
-        const horizontalSpacing = Math.min(168, Math.max(112, innerWidth * 0.116));
-        const verticalSpacing = Math.min(122, Math.max(88, innerHeight * 0.112));
+
+        const horizontalSpacing = Math.min(160, Math.max(110, innerWidth * 0.12));
+        const verticalSpacing = Math.min(115, Math.max(80, innerHeight * 0.12));
 
         cards.forEach((card, index) => {
           const delta = wrappedDelta(index, state.phase);
@@ -473,8 +742,9 @@
           const focus = Math.exp(-distance * distance * 1.28);
           const side = Math.max(0, 1 - distance / 5);
           const direction = Math.sign(delta);
+
           const x = compact
-            ? delta * 24 + Math.sin(delta * 0.9) * 25
+            ? delta * 26 + Math.sin(delta * 0.9) * 22
             : delta * horizontalSpacing;
           const y = compact
             ? delta * verticalSpacing
@@ -509,4 +779,5 @@
     })();
   </script>
 </body>
+
 </html>
