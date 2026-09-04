@@ -3,14 +3,35 @@ import { MengToSketchbookLandingPage } from "./shaders/landing-pages/LandingPage
 import { CharacterCarousel } from "./shaders/character-carousel/CharacterCarousel";
 import "./shaders/threeui.css";
 
-const FlowerShape = ({ color = "#ffebf0" }: { color?: string }) => (
-  <svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-    <circle cx="100" cy="40" r="40" fill={color} />
-    <circle cx="157" cy="81" r="40" fill={color} />
-    <circle cx="135" cy="148" r="40" fill={color} />
-    <circle cx="65" cy="148" r="40" fill={color} />
-    <circle cx="43" cy="81" r="40" fill={color} />
-    <circle cx="100" cy="100" r="55" fill={color} />
+const Beautiful3DFlower = () => (
+  <svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ filter: 'drop-shadow(0 8px 16px rgba(255, 182, 193, 0.4))' }}>
+    <defs>
+      <radialGradient id="petal-grad" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stopColor="#ffffff" />
+        <stop offset="40%" stopColor="#ffebf0" />
+        <stop offset="100%" stopColor="#ffccd5" />
+      </radialGradient>
+      <radialGradient id="center-grad" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stopColor="#fff8fa" />
+        <stop offset="50%" stopColor="#ffebf0" />
+        <stop offset="100%" stopColor="#f4c2c2" />
+      </radialGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <g filter="url(#glow)">
+      <circle cx="100" cy="40" r="42" fill="url(#petal-grad)" />
+      <circle cx="157" cy="81" r="42" fill="url(#petal-grad)" />
+      <circle cx="135" cy="148" r="42" fill="url(#petal-grad)" />
+      <circle cx="65" cy="148" r="42" fill="url(#petal-grad)" />
+      <circle cx="43" cy="81" r="42" fill="url(#petal-grad)" />
+      <circle cx="100" cy="100" r="48" fill="url(#center-grad)" />
+    </g>
   </svg>
 );
 
@@ -141,6 +162,50 @@ export function App() {
           @keyframes fadeOut {
             to { opacity: 0; visibility: hidden; }
           }
+          
+          .heart {
+            height: 70px;
+            width: 70px;
+            background: #f20044;
+            transform: rotate(-45deg);
+            box-shadow: -10px -10px 90px #f20044;
+            animation: heartAnim 0.6s linear infinite;
+            position: relative;
+          }
+          
+          @keyframes heartAnim {
+            0% {
+              transform: rotate(-45deg) scale(1.07);
+              filter: blur(0px);
+            }
+            80% {
+              transform: rotate(-45deg) scale(1);
+              filter: blur(1px);
+            }
+            100% {
+              transform: rotate(-45deg) scale(0.8);
+              filter: blur(2px);
+            }
+          }
+          
+          .heart:before {
+            content: "";
+            position: absolute;
+            height: 70px;
+            width: 70px;
+            background: #f20044;
+            top: -50%;
+            border-radius: 50px;
+          }
+          .heart:after {
+            content: "";
+            position: absolute;
+            height: 70px;
+            width: 70px;
+            background: #f20044;
+            right: -50%;
+            border-radius: 50px;
+          }
         `}
       </style>
 
@@ -167,12 +232,10 @@ export function App() {
           }}
         >
           <div style={{ position: 'relative', width: '200px', height: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', filter: 'drop-shadow(0 10px 20px rgba(255,182,193,0.6))' }}>
-            <div style={{ position: 'absolute', inset: 0, zIndex: -1 }}>
-              <FlowerShape color="#ffebf0" />
+            <div style={{ position: 'absolute', inset: 0, zIndex: -1, display: 'flex', justifyContent: 'center', alignItems: 'center', transform: 'scale(1.5)' }}>
+              <div className="heart"></div>
             </div>
-            <h1 style={{ fontFamily: '"Instrument Serif", serif', fontSize: '72px', color: '#d4778d', margin: 0 }}>
-              Love
-            </h1>
+
           </div>
           <p style={{
             fontFamily: '"Newsreader", serif',
@@ -213,7 +276,7 @@ export function App() {
         onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
         <div style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, zIndex: -1 }}>
-          <FlowerShape color="#ffebf0" />
+          <Beautiful3DFlower />
         </div>
         <span style={{ fontSize: '18px' }}>
           {isMuted ? '🔇' : '🎵'}
@@ -264,7 +327,7 @@ export function App() {
           }}
         >
           <div style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, zIndex: -1 }}>
-            <FlowerShape color="#ffebf0" />
+            <Beautiful3DFlower />
           </div>
           <div style={{
             fontFamily: '"Newsreader", serif',
@@ -272,7 +335,8 @@ export function App() {
             color: '#d4778d',
             textAlign: 'center',
             padding: '10px',
-            lineHeight: '1.2'
+            lineHeight: '1.2',
+            zIndex: 1
           }}>
             Read book,<br/>then click to<br/>memories 🌸
             <div style={{ fontSize: '10px', marginTop: '2px' }}>&darr;</div>
